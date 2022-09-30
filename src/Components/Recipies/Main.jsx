@@ -24,8 +24,18 @@ const Main = () => {
       const afterFilter = fromLocal.filter(obj => obj.idMeal !== e.target.value)
       localStorage.setItem("liked", JSON.stringify(afterFilter))
     }
+  }
 
-
+  const toSpread = e => {
+        if (JSON.parse(localStorage.getItem("liked")) === null) {
+      localStorage.setItem("liked", JSON.stringify([]))
+    }
+    const fromLocal = JSON.parse(localStorage.getItem("liked"))
+    const selected = fromLocal.find(obj => obj.idMeal === e.target.value)
+    if (selected.idMeal === e.target.value) {
+      selected.spread = !selected.spread
+      console.log(selected.spread);
+    }
   }
 
   return list === [] ? (
@@ -47,9 +57,7 @@ const Main = () => {
           >
             <h5>{recipe.strMeal}</h5>
             <div className="d-flex gap-2">
-              <button className="btn btn-outline-secondary btn-sm">
-                Spread cheeks
-              </button>
+            <button className="btn btn-outline-secondary btn-sm px-4" onClick={toSpread} value={recipe.idMeal}>Spread Cheeks!</button>
             <button className="btn btn-outline-dark btn-sm px-4" onClick={toLocal} value={recipe.idMeal}>Oh... Baby, dont press me!</button>
             </div>
           </li> :
@@ -62,17 +70,3 @@ const Main = () => {
 };
 
 export default Main;
-
-
-let kazkas = 2
-let daryti_kazka = 5
-
-
-// Paprastas
-if (kazkas > 0) {
-  console.log(daryti_kazka)
-} else {
-  console.log(`${kazkas} yra maziau negu 0`);
-}
-// Linijinis
-kazkas > 0 ? console.log(daryti_kazka) : console.log(`${kazkas} yra maziau negu 0`);
