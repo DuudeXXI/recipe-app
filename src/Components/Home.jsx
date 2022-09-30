@@ -8,6 +8,7 @@ const Home = () => {
   const [recipiesLocal, setRecipiesLocal] = useState([]);
   const [filtered, setFiltered] = useState([])
   const [show, setShow] = useState(false)
+  const [spread, setSpread] = useState(false)
 
   let submitCopy = submit;
   useEffect(() => {
@@ -17,8 +18,14 @@ const Home = () => {
         .then((res) => {
           setRecipies(res.data.meals);
         });
-    }, 1000);
-  }, []);
+      }, 300);
+    }, []);
+
+  if( recipies === null ){
+    return;
+  } else {
+    localStorage.setItem('fullList', JSON.stringify([...recipies]))
+  }
 
   const submitHandler = () => {
     setSubmit(search);
@@ -35,17 +42,34 @@ const Home = () => {
   }
 
   const toLocal = e => {
-    setShow(prev => !prev)
-    const fromLocal = JSON.parse(localStorage.getItem("liked"))
-    const recipe = recipies.find(obj => obj.idMeal === e.target.value)
-    if (fromLocal === null) {
-      return;
+    // IF NULL
+    if (JSON.parse(localStorage.getItem("liked")) === null) {
+      localStorage.setItem("liked", JSON.stringify([]))
     }
-    const toLocal = [
-      ...fromLocal, recipe];
-    localStorage.setItem('liked', JSON.stringify(toLocal))
+    // SELECTING
+    const fromLocal = JSON.parse(localStorage.getItem("liked"))
+    const selected = fromLocal.find(obj => obj.idMeal === e.target.value)
 
+
+    if(selected === undefined) {
+      // IF DOES NOT EXIST
+      const recipe = recipies.find(obj => obj.idMeal === e.target.value)
+      const newRecipe = {...recipe, show:false, spread:false}
+      const toLocal = [
+        ...fromLocal, newRecipe];
+      localStorage.setItem("liked", JSON.stringify(toLocal))
+
+    } else if (selected.idMeal === e.target.value) {
+
+
+
+      
+      // IF EXISTS
+      const afterFilter = fromLocal.filter(obj => obj.idMeal !== e.target.value)
+      localStorage.setItem("liked", JSON.stringify(afterFilter))
+    };
   }
+
 
 
   return (
@@ -77,7 +101,7 @@ const Home = () => {
                     <h4>{recipe.strMeal}</h4>
                     <div className="image-wrap"><img src={recipe.strMealThumb} alt="" /></div>
                   </div>
-                  {show === false ? <button className="btn btn-outline-dark btn-sm" onClick={toLocal} value={recipe.idMeal}>Like me bitch</button> : <button className="btn btn-outline-dark btn-sm px-4" onClick={toLocal} value={show}>Liked</button>}
+                  {recipe.show === false ? <button className="btn btn-outline-dark btn-sm" onClick={toLocal} value={recipe.idMeal}>Like Me Baby</button> : <button className="btn btn-outline-dark btn-sm px-4" onClick={toLocal} value={recipe.idMeal}>Oh... Baby!</button>}
                   <ul className="list-group mt-4">
                     <li className="list-group-item"> <p>{recipe.strInstructions}</p></li>
                     <li className="list-group-item">{recipe.strIngredient1} / {recipe.strMeasure1}</li>
